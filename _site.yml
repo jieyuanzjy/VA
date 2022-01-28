@@ -10,9 +10,9 @@ navbar:
     - text: "About"
       href: about.html
   left:
-    - text: "Take-home Exercise"
+    - text: "Take-home Exercise "
       menu: 
-      - text: "Take-home Exercise 1"
+      - text: "Take-home Exercise 1 "
         href: "TakeHomeEx/TakeHomeEx1/Ex1.html"
     - text: "DataViz Makeover"
       menu:

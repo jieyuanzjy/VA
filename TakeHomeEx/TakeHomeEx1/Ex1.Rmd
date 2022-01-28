@@ -1,7 +1,7 @@
 ---
 title: "Pareto chart & Age-Sex Pyramid"
 description: |
-  Take Home Exercise 1
+  Take-Home Exercise 1
 author:
   - name: Zhang Jieyuan
 
