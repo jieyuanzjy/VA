@@ -1,0 +1,130 @@
+---
+title: "Take Home Exercise 1"
+description: |
+  This showcases two data visualisations. 
+  1. A pareto chart showing showing the distribution of returns by product sub-category using Superstore data. 
+  2. A age-sex pyramid showing the demographic structure of Singapore by age cohort and gender. The data used is Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2021
+author:
+  - name: Zhang Jieyuan
+    url: https://example.com/norajones
+    affiliation: 
+    affiliation_url: https://example.com/spacelysprokets
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+## 1.0 Introduction
+
+
+## 2.0 Pareto chart: Superstore Data
+
+### 2.1 Data Preparation
+
+Install the necessary R packages - 'tidyverse', 'readxl', 'knitr', 'ggplot2'.
+
+```{r}
+packages = c('tidyverse', 'readxl', 'knitr', 'ggplot2', 'ggQC','reshape2')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+Import data from "Orders" sheet and "Returns" Sheet.
+
+```{r}
+orders <- read_xls("data/Superstore-2021.xls",
+                  sheet = "Orders")
+returns <- read_xls("data/Superstore-2021.xls",
+                  sheet = "Returns")
+```
+
+Join the returns data frame and orders data frame by using Order ID as the unique identifier.
+
+```{r}
+joined_tab <- left_join(returns, orders,
+                        by = c('Order ID' = 'Order ID'))
+```
+
+
+Derive frequency of the returns by sub-categories using group_by() and summarise() of dplyr packages.
+
+```{r}
+freq_returned <- joined_tab %>%
+  group_by(`Sub-Category`) %>%
+  summarise('Returns' = n()) %>%
+  ungroup()
+```
+
+Sort Sub-Category by descending order.
+
+```{r}
+freq_sorted <-freq_returned %>%
+  arrange(desc(Returns))
+
+```
+
+Compute the cumulative frequency.
+
+```{r}
+freq_cum<-freq_sorted %>%
+  mutate(cumfreq=cumsum(Returns))
+
+```
+
+### 2.2 Plot the Pareto Chart
+Plotting Pareto Chart with ggplot and stat_pareto() function in ggQC.
+
+```{r}
+ggplot(freq_cum, aes(x=reorder(`Sub-Category`,-Returns), y = Returns))+
+  stat_pareto(point.color = "black",
+              point.size = 2,
+              line.color = "black",
+              line.size = 1,
+              bars.fill = "light blue")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.6))+
+  labs(title = "Pareto Chart", x="Sub-Category")
+  
+```
+## 3.0 Age-Sex Pyramid - Singapore Residents
+
+### 3.1 Import the Population Data
+
+```{r}
+SGpop<-read_csv("data/respopagesextod2021.csv")
+```
+
+### 3.2 Data Preparation
+
+Group the data by age group and sex.
+
+```{r}
+SGpop_grouped <- SGpop %>%
+  group_by(AG,Sex) %>%
+  summarise(`Total Pop`=sum(Pop))%>%
+  ungroup()
+
+SGpop_grouped
+```
+### 3.3 Plotting the Age-Sex Pyramid
+
+
+```{r}
+ggplot(SGpop_grouped, aes(x = AG, fill= Sex, y = ifelse(test = Sex =="Males",
+                                             yes = -`Total Pop`, no = `Total Pop`)))+
+  geom_bar(stat="identity")+
+  
+  scale_y_continuous(labels = abs, limits = max(SGpop_grouped$`Total Pop`) * c(-1,1)) + 
+  coord_flip()+
+  labs(title = "Age-Sex Pyramid for 2021 SG Population", y="Population", x="Age Group")
+  
+ 
+```
