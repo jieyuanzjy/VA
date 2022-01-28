@@ -122,7 +122,7 @@ SGpop_grouped <- SGpop %>%
 
 SGpop_grouped
 ```
-Split the Age group to the starting age and ending age of the age group and convert them to numeric.This is to enable the sorting of age group by starting age later.
+Split the Age group to the starting age and ending age of the age group using separate() function in dplyr package and convert them to numeric.This is to enable the sorting of age group by starting age later.
 
 ```{r}
 SGpop_grouped2<- separate(data=SGpop_grouped, col=AG, 
