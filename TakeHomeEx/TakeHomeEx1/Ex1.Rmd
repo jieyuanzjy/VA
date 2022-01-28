@@ -1,14 +1,10 @@
 ---
-title: "Take Home Exercise 1"
+title: "Pareto chart & Age-Sex Pyramid"
 description: |
-  This showcases two data visualisations. 
-  1. A pareto chart showing showing the distribution of returns by product sub-category using Superstore data. 
-  2. A age-sex pyramid showing the demographic structure of Singapore by age cohort and gender. The data used is Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2021
+  Take Home Exercise 1
 author:
   - name: Zhang Jieyuan
-    url: https://example.com/norajones
-    affiliation: 
-    affiliation_url: https://example.com/spacelysprokets
+
 date: "`r Sys.Date()`"
 output: distill::distill_article
 ---
@@ -19,16 +15,21 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE)
 ```
 ## 1.0 Introduction
+This showcases two data visualisations.
 
+* A pareto chart showing the distribution of returns by product sub-category using Superstore data. 
+* A age-sex pyramid showing the demographic structure of Singapore by age cohort and gender. 
 
 ## 2.0 Pareto chart: Superstore Data
 
+The aim is to build pareto chart showing the distribution of returns by product sub-category using Superstore data. It will show the count of returns by subcategory of product from the highest returns to lowest returns and the cumulative percentage. This will enable us to examine if any one or few of sub-category(ies) is(are) contributing to the majority of returns and identify if further improvement is needed for the sub-categories.
+
 ### 2.1 Data Preparation
 
-Install the necessary R packages - 'tidyverse', 'readxl', 'knitr', 'ggplot2'.
+Install the necessary R packages - 'tidyverse', 'readxl', 'knitr', 'ggplot2'and 'ggQC'.
 
 ```{r}
-packages = c('tidyverse', 'readxl', 'knitr', 'ggplot2', 'ggQC','reshape2')
+packages = c('tidyverse', 'readxl', 'knitr', 'ggplot2', 'ggQC')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -38,7 +39,7 @@ for(p in packages){
 }
 
 ```
-Import data from "Orders" sheet and "Returns" Sheet.
+Data from the Superstore-2021.xls file is used. The following code chunk imports data from "Orders" sheet and "Returns" Sheet.
 
 ```{r}
 orders <- read_xls("data/Superstore-2021.xls",
@@ -47,7 +48,7 @@ returns <- read_xls("data/Superstore-2021.xls",
                   sheet = "Returns")
 ```
 
-Join the returns data frame and orders data frame by using Order ID as the unique identifier.
+The subcategory is only present in the "Orders" sheet. "Returns" sheet only contain the Order ID of the return products. Join the returns dataframe and orders dataframe by using Order ID as the unique identifier.
 
 ```{r}
 joined_tab <- left_join(returns, orders,
@@ -64,7 +65,7 @@ freq_returned <- joined_tab %>%
   ungroup()
 ```
 
-Sort Sub-Category by descending order.
+Sort sub-categories by descending order of the frequency of returns.
 
 ```{r}
 freq_sorted <-freq_returned %>%
@@ -72,7 +73,7 @@ freq_sorted <-freq_returned %>%
 
 ```
 
-Compute the cumulative frequency.
+Compute the cumulative frequency after sorting the sub-categories by the frequency of returns
 
 ```{r}
 freq_cum<-freq_sorted %>%
@@ -91,10 +92,17 @@ ggplot(freq_cum, aes(x=reorder(`Sub-Category`,-Returns), y = Returns))+
               line.size = 1,
               bars.fill = "light blue")+
   theme(axis.text.x = element_text(angle=90, vjust=0.6))+
-  labs(title = "Pareto Chart", x="Sub-Category")
+  labs(title = "Pareto Chart", x="Sub-Category") +
+  geom_hline(yintercept=0.8*max(freq_cum$cumfreq), linetype="dashed", 
+                color = "red", size=1) +
+  geom_text(aes(3,0.8*max(freq_cum$cumfreq),label = "80% of Cummulative %", vjust = -1))
   
 ```
+From the Pareto Chart above, we can observe that about top 8 sub-categories (out of 17 sub-categories) contributed to ~80% of the returns.
+
 ## 3.0 Age-Sex Pyramid - Singapore Residents
+
+The data used is *[Singapore Residents by Planning Area / Subzone, Age Group, Sex and Floor Area of Residence, June 2021](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data)* obtained from Singstat.The Age-Sex Pyramid will be able to illustrate the distribution of population by gender across different age groups in Singapore.
 
 ### 3.1 Import the Population Data
 
@@ -104,7 +112,7 @@ SGpop<-read_csv("data/respopagesextod2021.csv")
 
 ### 3.2 Data Preparation
 
-Group the data by age group and sex.
+Sum the population by age group and gender.
 
 ```{r}
 SGpop_grouped <- SGpop %>%
@@ -114,17 +122,28 @@ SGpop_grouped <- SGpop %>%
 
 SGpop_grouped
 ```
-### 3.3 Plotting the Age-Sex Pyramid
-
+Split the Age group to the starting age and ending age of the age group and convert them to numeric.This is to enable the sorting of age group by starting age later.
 
 ```{r}
-ggplot(SGpop_grouped, aes(x = AG, fill= Sex, y = ifelse(test = Sex =="Males",
-                                             yes = -`Total Pop`, no = `Total Pop`)))+
-  geom_bar(stat="identity")+
-  
-  scale_y_continuous(labels = abs, limits = max(SGpop_grouped$`Total Pop`) * c(-1,1)) + 
-  coord_flip()+
-  labs(title = "Age-Sex Pyramid for 2021 SG Population", y="Population", x="Age Group")
+SGpop_grouped2<- separate(data=SGpop_grouped, col=AG, 
+                          into=c("Starting_Age","Ending_Age"), 
+                          remove=FALSE, sep ="_to_") 
+SGpop_grouped2$Starting_Age <- as.numeric(SGpop_grouped2$Starting_Age)
+SGpop_grouped2$Ending_Age <-as.numeric(SGpop_grouped2$Ending_Age)
+
+```
+
+### 3.3 Plotting the Age-Sex Pyramid
+
+geom_col() is used to plot the Age-Sex Pyramid based in order to get the horizontal bars.In order to split the gender to two sides, males are plotted on negative x-axis and females are plotted on positive x-axis. To ensure that the age group are sorted numerically, the y axis is sorted based on the starting age of the age group.
+
+```{r}
+ggplot(SGpop_grouped2, aes(y = reorder(AG,Starting_Age), fill= Sex, 
+                           x = ifelse(test = Sex =="Males",
+                                      yes = -`Total Pop`, no = `Total Pop`)))+
+  geom_col(stat="identity")+
+  scale_x_continuous(labels = abs, limits = max(SGpop_grouped2$`Total Pop`) * c(-1,1)) + 
+  labs(title = "Age-Sex Pyramid for 2021 SG Population", x="Population", y ="Age Group")
   
  
 ```
