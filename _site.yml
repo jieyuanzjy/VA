@@ -14,6 +14,8 @@ navbar:
       menu: 
       - text: "Take-home Exercise 1 "
         href: "TakeHomeEx/TakeHomeEx1/Ex1.html"
+      - text: "Take-home Exercise 2 "
+        href: "TakeHomeEx/TakeHomeEx2/Ex2.html"
     - text: "DataViz Makeover"
       menu:
       - text: "DataViz 1"
