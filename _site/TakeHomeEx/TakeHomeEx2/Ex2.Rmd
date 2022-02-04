@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE,
 The aim of this exercise is to design an age-sex pyramid based data visualisation to show the changes of demographic structure of Singapore by age cohort and gender between 2000-2020 at planning area level.The data used is *[Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2000-2010 and Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data)* obtained from Singstat.
 
 I would like to explore the following visualisations:
+
 * Animated age-sex pyramid that changes across time for 1 planning area
 * Age-sex pyramid that changes for 1 planning area in a particular year with tooltip
 * Age-sex pyramid comparing a few planning area and how the population distribution changes across time for these areas
@@ -87,7 +88,7 @@ Attempt to draw an animated Age-Sex Pyramid by filtering out 1 planning area fir
 Pop_filter<-Pop_grp2 %>%
   filter(PA=="Ang Mo Kio")
 
-r<-ggplot(Pop_filter, aes(y = reorder(AG,Starting_Age), fill= Sex, 
+ggplot(Pop_filter, aes(y = reorder(AG,Starting_Age), fill= Sex, 
                            x = ifelse(test = Sex =="Males",
                                       yes = -`Total Pop`, no = `Total Pop`)))+
   geom_col(stat="identity")+
