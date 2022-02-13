@@ -18,7 +18,7 @@ navbar:
         href: "TakeHomeEx/TakeHomeEx2/Ex2.html"
     - text: "DataViz Makeover"
       menu:
-      - text: "DataViz Makeover 1"
+      - text: "DataViz Makeover 1 "
         href: "DataViz_Makeover/DataViz_Makeover1/Makeover1.html"
       - text: "DataViz Makeover 2"
         href: "DataViz2.html"
