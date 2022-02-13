@@ -1,0 +1,218 @@
+---
+title: "DataViz Makeover 1"
+description: |
+  Makeover a chart of labour force participation rate using Tableau. Critics and suggestions are provided before reworking on the visualisation.
+  
+author:
+  - name: Zhang Jieyuan 
+
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.retina = 5)
+```
+
+# 1.0 The Orginal Visualisation
+
+The original chart is created using the data on [Resident Labour Force Participation Rate (LFPR) by Age and Sex](https://stats.mom.gov.sg/Pages/LabourForceTimeSeries.aspx) provided by Ministry of Manpower. Data from 2010 - 2021 are used.
+
+![Fig 1 Original Chart](pic/Original.png)
+
+# 2.0 Critics of Original Visualisation
+
+### 2.1 Clarity
+
+1. **Title of Chart**: The title only mentioned that it is labour force participation rate (LFPR). It could have state clearly that it is the labour force participation across 2010 to 2021 period to provide greater clarity on the data used. Additionally, the title/subtitle could also illustrate the key insight from the chart to better communicate the intention or the key story.
+
+2. **Y-Axis**: The Y-Axis just state "Lfpr" and assumed that readers will know that "Lfpr" stands for labour force participation rate. "(LFPR)" could have been added after "Labour force participation rate" in title if abbreviation is used subsequently. Additionally, the unit of y-axis which is percentage is also not stated. 
+
+3. **X-Axis**: Only year 2015 is shown in the x-axis. This could be misleading to reader. The reader might have thought that it is reflecting how LFPR has changed in 2015 across the different months. In fact, the data is used is 2010 to 2021, 2015 is likely only shown due to the narrow width of the x-axis for each age group.
+
+### 2.2 Asethetic
+
+1. **Age group**: Age group are not sorted by descending or ascending order of age, but sorted by increasing average LFPR which makes it difficult for reader to assess and compare how the LFPR trend changes with increase in age group. If the reader only glance through the chart by reading the left most and right most age group, the reader might even think that the overall LFPR increases as age group gets younger. However, age group 15 to 19 and 20 t0 24 are in fact in the third and eighth column respectively (starting from the left).
+
+2. **Color**: The colors in the chart do not provide additional meaning or representation. In fact, having many colors in the original chart makes it looks messy.
+
+3. **Overlapped Age Categories**: Both "70 to 74" & "above 75" and "above 70" are plotted.The first two age group is an overlap with the latter. This might be confusing if the reader would like to see how the LFPR has changed with increasing age group.
+
+# 3.0 Proposed Visualisation
+
+The initial proposed design is shown below:
+
+![Fig 2 Proposed Design](pic/Proposed_Drawing.jpg)
+
+### 3.1 Clarity
+
+1. **Title & Subtitle**: 
+* To better communicate the key message, the title will be conveying the key insight from the chart.
+* Subtitle will provide a clear context to reader that this chart is showing "Annual Labour Force Participation Rate from 2010 to 2021".Reader will be able to know that the data shown are annual data and time period reflected is from 2010 to 2021.
+
+2. **Overlay LFPR by Gender**:
+* Overlay LFPR by gender on the same chart will enable reader to understand at one glance if the changes in overall LFPR is contributed by changes in LFPR of female or male residents or both.
+
+3. **Textbox to illustrate key observations**
+* Adding textbox for key observations will highlight the observations to readers.
+
+4. **Labels & Source** 
+* Labels are added to show 2010 and 2021 value for male and female LFPR to enable readers to have a sense of changes in values across 11 years for the different genders. 
+* Source of data is added to the footnote to recognise the source and provide creditbility to the data.
+
+### 3.2 Asethetic
+
+1. **X-Axis**:
+* Years are hidden as reader will not be able to see all the year ticks due to narrow width. Since the period is illustrated in the subtitle, hiding the year axis will also help to reduce cluttering.
+* 70&Over age group is excluded from the chart as it is a duplicated age group when 70-74 and 75&Over are present. Removing it will enable reader to have better view of how the trend changes as the age group decreased. 70-74 and 75&Over are chosen over 70&Over to provide greater granularity with a further age group split.
+
+2. **Order of Age Group Axis**
+* Age group columns are sorting in decreasing order of the age group. This will allow reader to quickly observe how the LFPR trend changes with decreasing age group.
+
+3. **Colors and Shading**:
+* Color for the area which reflects the LFPR is changed to a single color with different gradients. Green is selected as red and blue lines which represent LFPR of females and males respectively can be clearly seen when overlay on green color. Different shades of the green is used to reflect the age group. Darker green reflects more senior age groups
+* Red and blue lines are overlay on the initial chart to reflect LFPR of females and males respectively which is in line with the color generally used to represent the genders.
+
+You may find the proposed visualisation on Tableau Public [**here**](https://public.tableau.com/app/profile/zhang.jieyuan/viz/DataVizMakeover1_16447526559550/LFPR).
+
+
+
+![Fig 3 Proposed Visualisation on Tableau Public](pic/Tableau_ver.png)
+
+
+
+# 4.0 Step-by-step Preparation Guide
+
+1. Add in a column of "Total", "Males" and "Females" in the excel tab 'mrsd_Res_LFPR_2' for pivoting later.
+
+![](pic/Cleaning/1. Add Column.png){width=100%}
+
+2. Open Tableau Prep Builder and drag in the excel file to start cleaning. Choose the 'mrsd_Res_LFPR_2' tab.
+
+![](pic/Cleaning/2. Drag file in.png){width=100%}
+
+3. Click on data interpreter and the column title will be automatically identified.
+
+![](pic/Cleaning/3. Data Interpreter.png){width=100%}
+
+4. Click on the “+” sign and “Pivot” . This will enable us to pivot the years to a column.
+
+![](pic/Cleaning/4. Pivot.png){width=100%}
+
+5.Pivot the years from columns to rows by dragging the years to pivoted fields.
+
+![](pic/Cleaning/5. Pivot Years.png){width=100%}
+
+
+6. Change the year to date format and LFPR to number(decimal) format.
+
+![](pic/Cleaning/6. Change format.png){width=100%}
+
+7. Rename the "Pivot1 Name", "Pivot1 Values" and "Age (Years) / Sex"  to "Year", "LFPR" and "Age Group" respectively by clicking on"..." and "Rename Field".
+
+![](pic/Cleaning/7. Change Column Name.png){width=100%}
+
+8. Add a cleaning step. Change "Females", "Males" and "Total" under "Age Group" to "Overall" as these values reflect the overall value for females, males and total and we can spot the gender using the "Category" column.
+
+![](pic/Cleaning/8. Change to overall.png){width=100%}
+
+9. Filter the dates by clicking "..." >>> "Filter" >>> "Calculation". When the Add Filter box appear, key in formula: YEAR([Year])>=2010.
+This will filter out values from year 2010 onwards.
+
+![](pic/Cleaning/9. Filter the dates.png){width=100%}
+
+10. Add a new pivot step to pivot "Category" to a column. Select the "Rows to Column" option this time. The field is aggregated by LFPR.
+
+![](pic/Cleaning/10 Pivot Category to Column.png){width=100%}
+
+11. Add another pivot step to pivot Males and Females from Columns to Rows again. This is required for us to plot the LFPR for Total vs LFPR by gender later using dual axis.
+
+Change the "Pivot1 Names" to "Gender", "Pivot1 Values" to "LFPR" and "Total" to "Overall".
+
+![](pic/Cleaning/11. Pivot Males and Females to Rows.png){width=100%}
+
+12. Add Output. Select the location of the output file accordingly. Click Run Flow.
+The output will be in the form of Tableau Extract.
+
+![](pic/Cleaning/12. Output Data.png){width=100%}
+
+13 Open Tableau and drag the Extract in to start the visualization.
+
+![](pic/Cleaning/13. Start Tableau.png){width=100%}
+
+14. Go to Sheet 1. Drag "Age Group" and "Year" to Columns and drag "Overall" into Rows. As "Overall" rows were duplicated when the "Females" and "Males" column are pivoted to rows during the data preparation. Hence, we need to use "Avg(Overall)" instead of the default "Sum(Overall)".
+
+![](pic/Cleaning/14. Put in rows and columns.png){width=100%}
+
+15. Change the view to "Entire View". Change the Marks to "Area".
+
+![](pic/Cleaning/15. Change to Area.png){width=100%}
+
+16. Drag "Age Group" to Color under Marks. This will add colors to the area by age group. Click on Color under Marks and "Edit Colors". Select Green as Color Palette to assign green colors with different gradient to different age groups.
+
+![](pic/Cleaning/16. Change area to green.png){width=100%}
+
+17. Sort the Age Group by descending order by clicking on the arrow next to age group and the "Sort".
+Then exclude the unnecessary columns ie "Overall" and "70&Over" by right clicking on the column name and click "Exclude".
+
+![](pic/Cleaning/17. Sort and Exclude Column.png){width=100%}
+
+18 Add "LFPR" to Rows. Change the Marks to "Line".
+
+![](pic/Cleaning/18. Add LFPR.png){width=100%}
+19. Drag "Gender" to Color to split the LFPR by gender.Edit colors of line by assigning red to Females and blue to Males.
+
+![](pic/Cleaning/19. Split by Gender and Change color.png){width=100%}
+
+20. Click on the arrow next to "SUM(LFPR)" and select "Dual Axis" to overlap the two charts.
+
+![](pic/Cleaning/20. Dual Axis.png){width=100%}
+
+21. Click on the Y Axis to be edited. Right click and select "Edit Axis". For both Y axes, change the Fixed Start to 0 and Fixed End to 100, since LFPR are in % and should be in the 0% to 100% range. For primary y-axis,change the title to "LFPR,%". For secondary y axis, tick "Synchronize dual axes" to ensure the two axes are synchronized.
+
+![](pic/Cleaning/21. Edit Y Axes.png){width=100%}
+
+22. Untick "Show Header" for the "Year" to hide the ticks for year.Similarly, untick "Show Header" for "Sum(LFPR)" to hide the secondary y-axis.
+
+![](pic/Cleaning/22. Untick Show Header.png){width=100%}
+
+23. Add in labels for the LFPR for the two gender at the start and end of the line by selecting Label >>> tick "Show mark labels" >>> Select " Line Ends" under Marks to Label. Adjust the labels slightly by shifting it up or down to prevent overlap with other numbers or the line.
+
+![](pic/Cleaning/23. Add Labels.png){width=100%}
+24. Edit the labels by selecting "Format" under the arrow next to sum(LFPR). Click "Pane" and edit the numbers 1 decimal place.
+
+![](pic/Cleaning/24. Edit Labels.png){width=100%}
+
+
+25. Double click the title of chart to edit the title.
+
+![](pic/Cleaning/25. Edit Title.png){width=100%}
+26. Start a new Dashboard and drag Sheet 1 to the dashboard.
+
+![](pic/Cleaning/26. Start Dashboard.png){width=100%}
+
+27. Title & Footnote: Textbox to be added using "Text" under Tiled Option.
+    Observations: Textbox to be added using "Text" under Floating Option.
+    
+![](pic/Cleaning/27. Add in textbox.png){width=100%}
+
+28. Color of the text box can be changed under Layout >>> Background after the textbox is selected.
+
+![](pic/Cleaning/28. Textbox background.png){width=100%}
+
+# 5.0 Key Observations
+
+**1. Steepest increase in LFPR come from age groups between age 60 - 74.** 
+
+Highest LFPR increase happened for age 65 to 69 (+14.7%), followed by age 70 - 74 (+11.4%) and age 60 - 64 (+11.2%). The growth in LFPR for these age groups are consistent among both females and males. In 2019, the retirement age was increased to 62 years old and re-employment age increased to 67 years old. In line [government policy](https://www.todayonline.com/singapore/govt-raise-retirement-age-65-and-re-employment-age-70-2030-cpf-contribution-rates-older) to increase retirement age and re-employment age with the growing longevity of our people, we can observed LFPR of the elderly increased consistently and rapidly over the years. 
+
+According to [MOM](https://stats.mom.gov.sg/Pages/Growing_Alongside_Our_Ageing_Workforce.aspx), the higher LFPR among the elderly could also be partly driven by by increasingly fewer young population joining the work force with declining birth rate and aging population.
+
+**2.Overall LFPR for age groups in 30  - 49 years old range are mainly contributed by the strong rise in female LFPR.**
+Male LFPR for these age groups have been stable with minimal increase or decrease across the 2010 to 2021 period. The stagnant LFPR for males in these age group is likely due to the fact that it is already high at >95%.
+
+In contrast, female LFPR for these groups has increased >10% from 2010 to 2021 for these age groups.This could be due to government policies and advocate for women in the mid age to join the workforce.This could be due to increase [caregiving support](https://www.channelnewsasia.com/singapore/employment-rate-singapore-women-rose-past-decade-share-among-pmet-ministry-manpower-2430196) by the government as well as the [narrowing pay gap](https://www.straitstimes.com/singapore/manpower/singapore-women-earn-6-less-than-men-but-gap-has-narrowed-study).
+
+**3.High fluctuation in the LFPR for age group 15 to 19 and 20 to 24 across the years.**  It is likely that these group of residents are people who are newly joining the workforce, just graduated from ITEs, polytechnics, universities or other tertiary educational institutions. Hence, their LFPR might be highly related to the employability of inexperienced employees in the labour market for a particular year. For example, in 20 - 24 age group, the LFPR is 56.0% in 2020, 5% lower than the previous year.This coincides with the trend that [fewer graduates found permanent jobs](https://www.channelnewsasia.com/singapore/graduate-employment-survey-2020-covid-19-uni-grad-jobs-361801) amid of the slower economy due to the COVID-19 pandemic.
+
+
