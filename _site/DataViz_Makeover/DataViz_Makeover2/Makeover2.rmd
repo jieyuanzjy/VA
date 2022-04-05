@@ -1,0 +1,256 @@
+---
+title: "DataViz Makeover 2"
+description: |
+  Makeover the interactive visualisation of inter- and intra-zonal public bus flows  using Tableau. Critics and suggestions are provided before reworking on the visualisation.
+  
+author:
+  - name: Zhang Jieyuan 
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.retina = 3)
+```
+
+# 1.0 The Original Visualisation
+The original visualization is created using the following two datasets with the aim to reveal inter- and intra-zonal public bus flows at the planning sub-zone level of January 2022.
+
+* **Origin_destination_bus_SZ_202201.csv**: Downloaded from LTA Datamall and URA region, planning area and planning subzone information were added by using GIS Overlay operation.
+* **MP14_SUBZONE_WEB_PL**: Downloaded from data.gov.sg. this data provides URA Master Plan 2014 Planning Subzone boundary map in ESRI shapefile format.
+
+![Fig 1 Original visualisation](pic/Original.png)
+[Link to original visualisation](https://public.tableau.com/app/profile/tskam/viz/prototype1_16468762782120/Dashboard1)
+
+
+# 2.0 Critics of Original Visualisation
+
+### 2.1 Clarity
+
+ 1. **Title:** Title of the charts does not allow the reader to understand clearly the content shown at one glances. Reader will have to read the tooltip to find out what the charts are plotting.
+- The histogram shows the total number of trips which readers will only know when they hover over the bars to read the tooltips. 
+- Similarly, the adjacency matrix illustrates the % of the buses from  origins that goes to the different destinations which is unclear to the reader by just stating "Adjacency Matrix". It is also not clear the time period of these data.
+
+2. **Hard to find specific subzone for adjacency matrix** : As there are many subzones, it is extremely hard for readers to find the specific planning area to understand/analyse if they are interested to zoom into a particular subzone. It will be good if filter can be added for the adjacency matrix to enable readers to zoom into a particular.
+
+### 2.2 Asethetic & Interactivity
+
+1. **Long filter list for subzones:** Long list of subzones is shown at the side whereby users have to scroll slowly and find the specific subzone. Perhaps a dropdown filter with the search function can be use to make it more user friend for the readers.Given the filters are at the right of the adjacency matrix, it might be misleading to the readers who may initially think that the filters are meant for all the charts. The position of the filter could be placed closer to the charts which it is working on. 
+
+2. **Overlapping subzones for the adjacency matrix**: Subzones are purely sorted by alphabetical order and the names of the subzones overlap on top of one another. Furthermore, there are no filter available to zoom into a particular origin/destination subzone. Hence it is extremely difficult for the readers to find a specific subzone or generate insights. Users are not able to view the adjacency metrics clearly given the large number of subzones and limited space give. I would suggest to place adjacency martrix in separate dashboard to provide ample space to show more content and, at the same time, adding in extra filters to enable readers to zoom into the flow by subzones.
+
+3 **Limited interaction between charts:** By clicking on charts (eg the bar for the weekday trip count), it does not highlight or filter in other charts to allow users to connect between the chars. I would suggest to include more dashboard action to allow users to connect the different charts by incorporating more interactivity.
+
+
+# 3.0 Proposed Visualisation
+
+The initial proposed design is shown below:
+
+![Fig 2 Proposed Design - Tab 1](pic/Proposed tab 1.jpg)
+![Fig 3 Proposed Design - Tab 2](pic/Proposed tab 2.jpg)
+
+
+
+### 3.1 Clarity
+
+1.**Clearer title and headers:** Clearer headers and axis labels will be added to help user to understand the content at one glance.The time period of Jan 2022 will be added to the title for greater clarity.
+
+2.**Added Map for comparisons across subzone**: The initial histogram only allows us to compare the number of trips across time for 1 particular subzone. Maps for both trips for both origin subzones and destination subzones are added to allow user to compare the total trips across the different subzones. Filters on weekend/weekday and hours of the day to allow users to see to observe the changes in value when parameters changes.
+
+3. **Adjacency Matrix:** 
+* The two adjacency matrix is put separately into another dashboard (tab 2). This is to give the two heatmaps more space to display.
+* Filters are added to allow users to filter and zoom into specific region, planning area and subzone for both origin and destination
+* Subzones in the heatmap are group together by regions and planning areas rather than alphabetical order for convenience during insight generation.
+* Filter of the value are also added for user to zoom into viewing the heatmap within a narrower range of % of total trip. Eg. the user might want to look into region with high % of total trip by origin subzone.
+
+
+### 3.2 Asethetic & Interactivity
+
+1.**Combined charts for better layout**: The weekend and weekday histogram on number of trip for a origin/destination are combined into one chart leveraging side-by-side bar for easier comparison of trend between weekday and weekend; and also save space for other visualizations in the same dashboard to enable the users to generate more insights.
+
+2.**Interactivity**: Dashboard actions are added.
+
+* When the location is selected in the map, the bar chart on number of trips will change correspondingly with the action filter.
+* When the bar in the side-by-side bar chart is selected for origin subzone, the bars for the same hours in the day and day type will be highlighted in the destination subzone, vice versa.
+
+3.**Interactive icon will be added to tab 2 to explain the content:** This to explain the objective of the heatmaps and provide greater clarity of how the values are created.
+
+You may find the proposed visualisation on Tableau Public [**here**](https://public.tableau.com/views/DataVizMakeover2_16483011358330/NumberofTrips?:language=en-US&:display_count=n&:origin=viz_share_link).
+
+![Fig 4 Proposed Visualisation on Tableau Public - Tab 1](pic/New Tab 1.png)
+![Fig 5 Proposed Visualisation on Tableau Public - Tab 2](pic/New Tab 2.jpg)
+
+
+# 4.0 Step-by-step Preparation Guide
+
+1. Drag the origin_destination_bus__SZ_202201.csv in the data source tab. Add new connection to add in the *MP14_SUBZONE_WEB_PL.shp* file with the SHP file type. Drag the  *MP14_SUBZONE_WEB_PL.shp* to connect with the origin_destination_bus__SZ_202201.csv twice:
+
+* To map the geospatial data for (1) destination subzone and (2) origin subzone by clicking on the many-to-many relationship and define the join.
+* Change the Destination/Origin Subzone to capital letter and join with Subzone N from the spatial file.
+
+![](pic/steps/1. Connection.png){width=100%}
+
+### 4.1 Building the side by side bar charts
+
+2.Drag in the "Time per Hour" and "Day Type" to columns and "Total Trips" to rows. Drag "Origin subzone" and "Day Type" to filter.
+
+![](pic/steps/2. Barchart_raw.png){width=100%}
+
+3. Hide time per hour from 0 - 5 as there are very little bus trips.We want to focus the visualization on the usual operating hours.
+
+![](pic/steps/3. hide time.png){width=100%}
+
+4.Hide the x-axis on weekday and weekend by right clicking on the x-axis and untick the "show header". This is to prevent cluttering as there are already legend to label it.
+
+![](pic/steps/4. hide x axis for histogram.png){width=100%}
+5.Rename "Hour Per Time" as "Time of the Day (Hour)" for easier interpretation.
+
+![](pic/steps/5. Rename Time.png){width=100%}
+
+6. Drag name of the subzone N that was mapped to origin Subzone previously. Drag it into the tooltip, edit the tooltip name to "Subzone" for the subzone. Double click on the title to insert the subzone as title so that it change dynamically when a subzone is filtered out.
+
+![](pic/steps/6. Add in the SZ.png){width=100%}
+7. Right click on the tab and duplicate the tab. Change the filter from "Origin Subzone" to "Destination Subzone". Change the Subzone N to the one that is connecting to Destination Subzone.Edit the title to reflect the new "Subzone N".
+
+![](pic/steps/7. Duplicate Trip Count.png){width=100%}
+
+### 4.2 Building the adjacency matrix
+
+8.In the data source tab, create two new calculated fields such that they shows the trip only when it is weekday and weekend respectively. Refer to the picture below fo the formula.
+
+![](pic/steps/8. Create WD WE trips columns.png){width=100%}
+
+9. Create another two new fields to calculate % of trips in the origin subzone contributed by each destination subzone This is done by dividing the sum of total trips by weekday/weekend by the total trips in each orign subzone using the fix function. Refer to the picture before for exact formula.
+
+![](pic/steps/9 Calculate Trip % by origin sz.png){width=100%}
+10. Create a new sheet to build the adjacency matrix for weekdays.
+
+Insert the destination region, planning area and subzone to columns and the orign region, planning area and subzone to rows. The different level of location categories are added to allow users to zoom into information at region and planning area level and group the subzones by the region and planning areas in heat map for clearer visualisation. Add in the filters as per the picture below
+
+Drag the "Weekday Trip%byOriginZone" calculated in Step 9 into color and filter. This will allow user to filter by the value too.
+
+![](pic/steps/10. Adjacency Matrix.png){width=100%}
+
+11. Change the format of the "Weekday Trip%byOriginZone" to percentage by : 1. Right click to format; 2. Click on Panes 3. Change the default number format to percentage. 
+
+![](pic/steps/11. Format to perc.png){width=100%}
+
+12. Duplicate the worksheet above to create the same heat map of weekend.Drag "Weekend Trip%byOriginZone" to replace "Weekday Trip%byOriginZone".
+
+![](pic/steps/12 Duplicate for weekend Adjacency matrix.png){width=100%}
+
+### 4.3 Showing total number of trips across different zone with map
+
+13. Starting with the Origin subzone. Drag the geometry of the shp file that is joined with the origin subzone to the center of the worksheet. The SG map by subzone will automatically appear.
+
+![](pic/steps/13 Draw Map.png){width=100%}
+
+14. Add in other measures and filters according to the chart as per the picture below.
+
+![](pic/steps/14 Add in the filter and measures for map.png){width=100%}
+
+15. Duplicate the tab created. Replace the geometry information with the geometry from SHP file that is joined with the destination subzone.
+
+![](pic/steps/15 Create Map for destination zone.png){width=100%}
+
+### 4.4 Combining into dashboards
+ 
+ 16.Use the horizontal and vertical objects to create layout as per the dotted line shown below. 
+ 
+ * Add in text box for the header and titles. Color of text box background can be changed by clicking on the layout pane >> background.
+ * Drag the bar chart and map related to origin zone to the left side while those related to destination subzone are placed on the right.
+ 
+![](pic/steps/16 Layout of dashboard.png){width=100%}
+
+17. Remove the title of the maps as grey bar already segmented the two areas by origin and destination subzones.
+![](pic/steps/17. Remove title of map.png){width=100%}
+
+ 18. Apply the Day Type filter to all the charts in this dashboard as per shown in the picture below. Repeat the same step to apply the Time of the Day (Hour) filter to both of the maps in the dashboard only.
+ 
+ ![](pic/steps/18 Day Type filter.png){width=100%}
+ 
+ 19. Add the highlight and filters using dashboard actions:
+ 
+  ![](pic/steps/19a dashboard actions.png){width=100%}
+ 
+ * Highlight the bars of same hour of the day when selected.
+ 
+![](pic/steps/19b highlight same time.png){width=100%}
+
+* Origin: Filter the bar chart by location when subzone is selected in map.
+
+![](pic/steps/19c filter org .png){width=100%}
+
+
+* Destination: Filter the bar chart by location when subzone is selected in map.
+
+![](pic/steps/19d filter des.png){width=100%}
+
+
+20. Create a new dashboard. Build the heatmap dashboard using the following layout. 
+
+* The entire dashboard only shows 2 heatmaps to allow user to see more detail.
+
+* Region, Planning Area and Subzone filters are added for both origin and destination. Apply these filters to both heatmap charts in this dashboard similar to step 18.
+
+* Filtering of the values are added below each heatmap.
+
+* Double clicking on the axis will allow user to zoom into the specific region, planning area or subzone.
+
+![](pic/steps/20. Create the heatmap dashboard.png){width=100%}
+
+21. To create the information icon to explain the second tab:
+a. Create a new worksheet. 
+b. Drag pt Type to row. 
+c. Hide Title. 
+d. Untick show headers. 
+e. Change the mark type to shape.
+d. Edit shape to find a preferred icon.
+e. Change the size of icon if needed
+
+![](pic/steps/21 Info tab 1.png){width=100%}
+
+22. Remove the background colors: Right click format>> format shading>> Change shading for worksheet to none.
+Remove the grid line: Right click format>> format borders>> change row divider panes to none.
+
+![](pic/steps/22 Info tab 2.png){width=100%}
+
+
+23. Add in the information as tooltips.
+
+![](pic/steps/23 info tab 3.png){width=100%}
+
+24. Place the icon as float in the dashboard. User will be able to see the information when hovering over it.
+
+![](pic/steps/24 Info tab 4.png){width=100%}
+
+
+# 5.0 Key Observations
+
+**1. Tampines East has the highest number of trips starting from the subzone and ending in the subzone, in line with the population trend.** From the maps, we have observe that compare to other subzones, Tampines East has the highest inflow and outflow of the bus trip. To further investigate the reason, I have visualised the total population by subzone using [Singstat's latest SG resident by planning area/subzone data,,released on June 2021](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data)as reference. The chart below illustrates that Tampines East subzone is the subzone in SG with higher number of population. Hence, the number of bus trip to and fro is also the highest to cater for the demand due to high population.
+
+![Population by subzone, Jun 2021](pic/insights/1 population.png){width=100%}
+
+Additionally when we look at the distribution of to and fro bus trip across time of the day using Tampines East as both origin and destination, we can observe that number of trips remains high for both morning and even peak hours. This could be because nearly half of bus trips of Tampines are servicing within its own subzone, ~43% on weekdays. Hence, the number of trip is high for both to and fro the subzone during peak hours to bring residents from home to mrt stations/schools and back from mrt stations/schools to home.
+
+![No of trips to and fro Tampines East](pic/insights/1b tampines 1.png){width=100%}
+
+
+![Bus trips servicing in Tampines East](pic/insights/1c tampines 2.png){width=100%}
+
+
+**2. Industrial area in west (Boon Lay, Pioneer, Tuas) has >80% of trips traveling to Jurong West Central, Joo Koon, Tuas Bay.** For the industrial areas in far west of SG, there are likely very limited number of different bus services numbers to other parts of SG due to the distance. Joo Koon and Tuas Bay are where the mrt stations (Joo Koon, Tuas West Road, Tuas Crescent) are located. Hence, bus servicing from pioneer and tuas industrial areas to Joo Koon and Tuas Bay are likely transporting workers to the nearest mrt. While Jurong West is the nearest residential zone near these industrial areas. Many of people working in Boon Lay could be residing in Jurong West.
+
+![Subzone with % of trips >80%](pic/insights/2 West industrial area.png){width=100%}
+ 
+ **3. Lim Chu Kang has very different trend vs other subzones.** 
+
+On weekdays, the number of trips to Lim Chu Kang peaks as early as 6am - 8am, while the number of trips traveling out from Lim Chu Kang reaches its highest from 3pm - 7pm. As Lim Chu Kang is the subzone whereby many farms are located, the number of trips trends on weekday likely coincides with the start and end of the working hours for the farm workers.
+
+On weekends and public holidays, we observed that the number of trips travelling to Lim Chu Kang from 10am - 4pm exceeds the number during same period on weekdays. The various farms in Lim Chu Kang such as vegetable farms and goat farms likely attract families with young children to visit. Hence, the number of trips to Lim Chu Kang during late morning and early afternoon is higher on weekends than weekdays to cater for such demand.
+
+![Lim Chu Kang Subzone](pic/insights/3. Lim Chu Kang.png){width=100%}
+
+
+ 
+ 
