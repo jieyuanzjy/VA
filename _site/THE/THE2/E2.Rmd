@@ -1,0 +1,180 @@
+---
+title: "Age-Sex Pyramid by SG Planning Area from 2000 - 2020"
+author:
+  - name: Zhang Jieyuan 
+
+date: Feb. 4, 2022
+output: distill::distill_article
+
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+## 1.0 Introduction
+
+The objective is to design an age-sex pyramid based data visualisation to show the changes of demographic structure of Singapore by age cohort and gender between 2000-2020 at planning area level.The data used is *[Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2000-2010 and Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data)* obtained from Singstat.
+
+I would like to explore the following visualisations:
+
+* Animated age-sex pyramid that changes across time for 1 planning area
+* Age-sex pyramid that changes for 1 planning area in a particular year with tooltip
+* Age-sex pyramid comparing a few planning area and how the population distribution changes across time for these areas
+* Check if filter can be applied on planning area and time
+
+
+## 2.0 Data Preparation
+
+Install the necessary R packages - 'tidyverse', 'readxl', 'knitr', 'ggplot2', 'plotly','DT','patchwork','gganimate','gifski','gapminder','ggiraph'.
+
+```{r}
+packages = c('tidyverse', 'readxl', 'knitr', 'ggplot2', 'plotly','DT','patchwork','gganimate','gifski','gapminder','ggiraph')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+
+### 2.1 Importing & Joining 2 Dataframe
+
+As the 2000-2010 data and the 2011 - 2020 data are in two separate files, we will first need to import them using read_ccv() and append them together using rbind().
+
+```{r}
+pop_2000to2010<-read_csv("data/respopagesextod2000to2010.csv")
+pop_2011to2020 <-read_csv("data/respopagesextod2011to2020.csv")
+pop_combined<- rbind(pop_2000to2010,pop_2011to2020)
+```
+### 2.2 Data Preparation
+
+Sum the population after grouping by planning area, year, age group and gender.
+
+```{r}
+Pop_grp <- pop_combined %>%
+  group_by(PA, Time, AG,Sex) %>%
+  summarise(`Total Pop`=sum(Pop))%>%
+  ungroup()
+
+Pop_grp
+
+```
+
+Split the age group to  starting age and ending age of the age group using separate() function in dplyr package and convert them to numeric.This is to enable the sorting of age group by starting age later.Split the Age group to the starting age and ending age of the age group using separate() function in dplyr package and convert them to numeric.This is to enable the sorting of age group by starting age later.
+
+```{r}
+Pop_grp2<-separate(data=Pop_grp,col = AG,into=c("Starting_Age","Ending_Age"),
+                   remove = FALSE, sep = "_to_")
+Pop_grp2$Starting_Age<-as.numeric(Pop_grp2$Starting_Age)
+Pop_grp2$Ending_Age<-as.numeric(Pop_grp2$Ending_Age)
+
+```
+
+### 2.3 Data visualisation
+
+#### 2.3.1 Animated Age-Sex Pyramid For One Planning Area Across Time
+
+Attempt to draw an animated Age-Sex Pyramid by filtering out 1 planning area first.The following chart shows how the population varies in Ang Mo Kio planning area from 2000 to 2020.
+
+```{r}
+Pop_filter<-Pop_grp2 %>%
+  filter(PA=="Ang Mo Kio")
+
+ggplot(Pop_filter, aes(y = reorder(AG,Starting_Age), fill= Sex, 
+                           x = ifelse(test = Sex =="Males",
+                                      yes = -`Total Pop`, no = `Total Pop`)))+
+  geom_col(stat="identity")+
+  scale_x_continuous(labels = abs, limits = max(Pop_filter$`Total Pop`) * c(-1,1))+  
+  labs(title = 'Age-Sex Pyramid for Ang Mo Kio Population in:{as.integer(frame_time)}', x="Population", y ="Age Group")+
+  transition_time(Time)+
+  ease_aes('linear')
+
+
+```
+
+#### 2.3.2 Age-Sex Pyramid For One Planning Area With Tooltip
+
+Try adding tooltip using the ggiraph package with data for a particular year and planning area. Geom_col_interactive() and girafe() are used to create this interaction.
+
+```{r}
+
+Pop_filter<-Pop_grp2 %>%
+  filter(PA=="Ang Mo Kio",Time=="2000")
+
+Pop_filter$tooltip<-c(paste0("Planning Area= ",Pop_filter$PA,
+                             "\n Gender= ", Pop_filter$Sex,
+                             "\n Pop = ", Pop_filter$`Total Pop`))
+
+q<-ggplot(Pop_filter, aes(y = reorder(AG,Starting_Age), fill= Sex, 
+                           x = ifelse(test = Sex =="Males",
+                                      yes = -`Total Pop`, no = `Total Pop`)))+
+  geom_col_interactive(tooltip=Pop_filter$tooltip)+
+  scale_x_continuous(labels = abs, limits = max(Pop_filter$`Total Pop`) * c(-1,1))+  
+labs( title = 'Age-Sex Pyramid for Ang Mo Kio Population in 2000',
+      x="Population", y ="Age Group")  
+
+girafe(
+  ggobj = q,
+  width_svg = 8,
+  height_svg = 8*0.618
+)
+```
+
+#### 2.3.3 Animated Age-Sex Pyramid For A Few Planning Area Across Time
+
+Filter raw data for the selected planning areas that we are keen to explore instead of drawing the age-sex pyramid for all planning areas to prevent cluttering of graphs. In this case, I have selected Ang Mo Kio & Bishan vs Punggol to observe how the population varies in more mature areas and less mature area across the years. facet_wrap() is used to show the charts split by the selected planning areas.
+
+
+```{r}
+
+Pop_filter2<-Pop_grp2 %>%
+  filter(PA=="Ang Mo Kio"|PA=="Bishan"|PA=="Punggol")
+
+r<-ggplot(Pop_filter2, aes(y = reorder(AG,Starting_Age), fill= Sex, 
+                           x = ifelse(test = Sex =="Males",
+                                      yes = -`Total Pop`, no = `Total Pop`)))+
+  geom_col(stat="identity")+
+  scale_x_continuous(labels = abs, limits = max(Pop_filter2$`Total Pop`) * c(-1,1))+  
+  labs(title = 'Age-Sex Pyramid for SG Population in:{as.integer(frame_time)}', 
+       x="Population", y ="Age Group")+
+  transition_time(Time)+
+  ease_aes('linear')
+
+r+theme(aspect.ratio = 1)+facet_wrap(~PA, scales = "free_x")
+```
+
+
+### 2.4 Challenges & Learnings
+Attempted to use [crosstalk](https://rstudio.github.io/crosstalk/using.html) together with plotly to design an age-sex pyramid that changes based on the year and planning area filter. However, the filter function only shows the position of data point after all data points are plotted instead of filtering the raw data to draw a new plot. 
+
+After researching [online](https://rstudio.github.io/crosstalk/),this could be due to the inherent limitations of crosstalk that "Crosstalk currently only works for linked brushing and filtering of views that show individual data points, not aggregate or summary views (where “observations” is defined as a single row in a data frame)."
+
+It is definitely more challenging to use R in creating the filters vs creating similar visualisations using Tableau.
+
+```{r}
+library(crosstalk)
+
+
+SharedPop<-SharedData$new(Pop_grp2)
+
+p<-ggplot(SharedPop, aes(y = reorder(AG,Starting_Age), fill= Sex, 
+                           x = ifelse(test = Sex =="Males",
+                                      yes = -`Total Pop`, no = `Total Pop`)))+
+  geom_col()+
+  scale_x_continuous(labels = abs)+  
+  labs(title = 'Age-Sex Pyramid for SG Population', x="Population", y ="Age Group")
+
+bscols(widths=c(2,NA,NA),
+      list(
+        filter_select("PA","Planning Area", SharedPop,~PA,multiple = FALSE),
+        filter_select("Time","Year", SharedPop,~Time,multiple = FALSE)
+        ), 
+     ggplotly(p)
+       )
+```
