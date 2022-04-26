@@ -25,10 +25,15 @@ output:
 
 
 #### Analysis using R Programming
-* [Pareto Chart & Age-Sex Pyramid]
-* [SG Population by Planning Area from 2000 - 2020]
-* [Visual Multivariate Analysis - Starbucks Drinks]
-* [Financial Data Analysis]
+* [Pareto Chart & Age-Sex Pyramid](https://jieyuan-analytics.netlify.app/takehomeex/takehomeex1/ex1)
+* [SG Population by Planning Area from 2000 - 2020](https://jieyuan-analytics.netlify.app/takehomeex/takehomeex2/ex2)
+* [Visual Multivariate Analysis - Starbucks Drinks](https://jieyuan-analytics.netlify.app/takehomeex/takehomeex3/ex3)
+* [Financial Data Analysis](https://jieyuan-analytics.netlify.app/takehomeex/takehomeex4/ex4)
 
 #### Data Visualisation and Insights Generation using Tableau
+* [DataViz Makeover 1](https://jieyuan-analytics.netlify.app/dataviz_makeover/dataviz_makeover1/makeover1)
+* [DataViz Makeover 2](https://jieyuan-analytics.netlify.app/dataviz_makeover/dataviz_makeover2/makeover2)
+* [Other Data Visualizations](https://public.tableau.com/app/profile/zhang.jieyuan)
+
+
 

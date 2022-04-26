@@ -1,34 +1,15 @@
 ---
-title: "Zhang Jieyuan"
-image: "jieyuan.jpg"
-links:
-  - label: LinkedIn
-    url: "https://www.linkedin.com/in/jieyuan-zhang/"
-  - label: GitHub
-    url: "https://github.com/jieyuanzjy/Personal"
-  - label: Tableau Public
-    url: "https://public.tableau.com/app/profile/zhang.jieyuan"
-  
-
-output:
-  postcards::trestles
+title: "Analytics"
+description: |
+  Welcome to the website. I hope you enjoy it!
+site: distill::distill_website
 ---
- 
-  Welcome to the website that showcases some of my analysis, projects and data visualizations. I hope you enjoy it!
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 
-#### Analysis using Python
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
 
-* [Spotify Music Analysis](https://github.com/jieyuanzjy/Personal/tree/main/Spotify%20Music%20Analysis)
-* [Fashion MNIST - Multiclass Classification Model](https://github.com/jieyuanzjy/Personal/tree/main/Fashion%20MNIST%20-%20Multiclass%20Classification%20Model)
-* [Hotel Cancellation Prediction Project](https://github.com/jieyuanzjy/Personal/tree/main/Hotel%20Cancellation%20Prediction)
-
-
-#### Analysis using R Programming
-* [Pareto Chart & Age-Sex Pyramid]
-* [SG Population by Planning Area from 2000 - 2020]
-* [Visual Multivariate Analysis - Starbucks Drinks]
-* [Financial Data Analysis]
-
-#### Data Visualisation and Insights Generation using Tableau
+```
 
