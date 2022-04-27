@@ -14,7 +14,7 @@ output:
   postcards::trestles
 ---
  
-  Welcome to the website that showcases some of my analysis, projects and data visualizations. I hope you enjoy it!
+  Welcome to the website that showcases some of my analysis, projects and data visualisations. I hope you enjoy it!
 
 
 #### Analysis using Python
@@ -33,7 +33,7 @@ output:
 #### Data Visualisation and Insights Generation using Tableau
 * [DataViz Makeover 1](https://jieyuan-analytics.netlify.app/dataviz_makeover/dataviz_makeover1/makeover1)
 * [DataViz Makeover 2](https://jieyuan-analytics.netlify.app/dataviz_makeover/dataviz_makeover2/makeover2)
-* [Other Data Visualizations](https://public.tableau.com/app/profile/zhang.jieyuan)
+* [Other Data Visualisations](https://public.tableau.com/app/profile/zhang.jieyuan)
 
 
 
